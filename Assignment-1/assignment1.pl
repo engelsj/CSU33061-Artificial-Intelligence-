@@ -1,19 +1,16 @@
 :- dynamic(kb/1).
 
 % Given 
-% Reads in the file and creates the knowledge base
 makeKB(File) :- open(File,read,Str),
                 readK(Str,K),
                 reformat(K,KB),
                 asserta(kb(KB)),
                 close(Str). 
 
-% Given
 readK(Stream,[]):- at_end_of_stream(Stream),!.
 readK(Stream,[X|L]):- read(Stream,X),
                       readK(Stream,L).
 
-% Given
 reformat([],[]).
 reformat([end_of_file],[]) :- !.
 reformat([:-(H,B)|L],[[H|BL]|R]) :- !,
@@ -21,12 +18,29 @@ reformat([:-(H,B)|L],[[H|BL]|R]) :- !,
                                     reformat(L,R).
 reformat([A|L],[[A]|R]) :- reformat(L,R).
 
-% Given
 mkList((X,T),[X|R]):- !, mkList(T,R).
 mkList(X,[X]).
 
-% Given
 initKB(File) :- retractall(kb(_)), makeKB(File).
 
-% Given
+less-than([[Node1|_],Cost1],[[Node2|_],Cost2]) :- heuristic(Node1,Hvalue1), heuristic(Node2,Hvalue2),
+                                                  F1 is Cost1+Hvalue1, F2 is Cost2+Hvalue2,
+                                                  F1 =< F2.
+
+
+
+heuristic(Node, Heuristic) :- length(Node, Heuristic).
+
+arc([H|T],Node,Cost,KB) :- member([H|B],KB), append(B,T,Node),
+                           length(B,L), Cost is L+1.
+
+goal([]). 
+
 astar(Node,Path,Cost) :- kb(KB), astar(Node,Path,Cost,KB).
+
+% Written Work 
+
+astar(Node, Path, Cost, KB) :- findRoute(Node, Node,)
+
+
+
